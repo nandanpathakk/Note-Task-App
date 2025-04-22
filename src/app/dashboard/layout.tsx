@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import supabase from "@/lib/supabase";
+import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -11,29 +12,39 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const checkSession = async () => {
       const { data } = await supabase.auth.getSession();
+      console.log("session", data?.session)
       if (!data.session) {
         router.push("/login");
+      } else {
+        setLoading(false);
       }
     };
 
     checkSession();
   }, [router]);
 
+  if (loading) {
+    return <div className="flex justify-center items-center h-screen">
+      <Loader2 className="h-14 w-14 stroke-2 animate-spin" />
+      </div>
+  }
+
   return (
     <div className="flex h-screen bg-gray-50">
       {/* Mobile sidebar */}
-      <div 
+      <div
         className={`fixed inset-0 z-40 md:hidden ${sidebarOpen ? 'block' : 'hidden'}`}
         aria-hidden="true"
       >
         {/* Background overlay */}
-        <div 
-          className="fixed inset-0 bg-gray-600 bg-opacity-75" 
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75"
           onClick={() => setSidebarOpen(false)}
         ></div>
         {/* Sidebar */}

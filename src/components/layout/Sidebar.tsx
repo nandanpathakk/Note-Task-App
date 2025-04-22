@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FileText, Plus, Home } from "lucide-react";
 
-// Add props interface
 interface SidebarProps {
   onClose?: () => void;
 }

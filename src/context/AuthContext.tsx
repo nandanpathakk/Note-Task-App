@@ -1,4 +1,3 @@
-// src/context/AuthContext.tsx
 "use client";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
@@ -24,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const getUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      console.log("session", session)
       setUser(session?.user || null);
       setLoading(false);
     };
