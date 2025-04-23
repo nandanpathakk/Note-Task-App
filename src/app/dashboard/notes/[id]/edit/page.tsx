@@ -23,14 +23,14 @@ export default function NoteEditPage() {
   const params = useParams();
   const router = useRouter();
   const noteId = typeof params.id === 'string' ? params.id : '';
-  
+
   const { data: note, isLoading, error } = useNote(noteId);
   const updateNote = useUpdateNote();
   const summarizeNote = useSummarizeNote();
-  
+
   const [title, setTitle] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  
+
 
   const editor = useEditor({
     extensions: [
@@ -70,7 +70,7 @@ export default function NoteEditPage() {
 
   const handleSave = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    
+
     if (!title.trim()) {
       toast.warning("Please enter a title for your note");
       return;
@@ -104,6 +104,7 @@ export default function NoteEditPage() {
       router.push(`/dashboard/notes/${noteId}/view`);
     } catch (error) {
       toast.error("Failed to save note");
+      console.error(error);
       setIsSaving(false);
     }
   };
@@ -125,13 +126,14 @@ export default function NoteEditPage() {
     });
 
     try {
-      await summarizeNote.mutateAsync({ 
-        id: noteId, 
+      await summarizeNote.mutateAsync({
+        id: noteId,
         content: cleanContent
       });
       toast.success("Your note has been summarized successfully");
     } catch (error) {
       toast.error("Failed to generate summary");
+      console.error(error)
     }
   };
 
@@ -148,7 +150,9 @@ export default function NoteEditPage() {
       <div className="container py-6">
         <div className="flex flex-col items-center justify-center py-12">
           <h2 className="text-xl font-bold mb-2">Note not found</h2>
-          <p className="text-muted-foreground mb-4">The note you're looking for doesn't exist or you don't have access to it</p>
+          <p className="text-muted-foreground mb-4">
+            The note you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it
+          </p>
           <Link href="/dashboard/notes">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -171,7 +175,7 @@ export default function NoteEditPage() {
           </Link>
           <h1 className="text-2xl font-bold">Edit Note</h1>
         </div>
-        <Button 
+        <Button
           onClick={handleSave}
           disabled={isSaving || !title.trim() || (editor ? editor.isEmpty : true)}
         >
@@ -188,7 +192,7 @@ export default function NoteEditPage() {
           )}
         </Button>
       </div>
-      
+
       <form onSubmit={handleSave} className="space-y-6">
         <div>
           <Input
@@ -198,19 +202,19 @@ export default function NoteEditPage() {
             className="text-xl font-medium"
           />
         </div>
-        
+
         <div className="border rounded-md">
           {editor && <EditorMenuBar editor={editor} />}
           <EditorContent editor={editor} className="min-h-[400px]" />
         </div>
-        
+
         {note.summary && (
           <div className="p-4 bg-muted rounded-md">
             <h3 className="font-medium mb-2">AI Summary</h3>
             <p className="text-sm text-muted-foreground">{note.summary}</p>
           </div>
         )}
-        
+
         <div className="flex justify-start gap-2">
           <Button
             type="button"
@@ -230,10 +234,10 @@ export default function NoteEditPage() {
               </>
             )}
           </Button>
-          
-          <Button 
-            type="button" 
-            variant="outline" 
+
+          <Button
+            type="button"
+            variant="outline"
             onClick={() => router.push(`/dashboard/notes/${noteId}/view`)}
           >
             Cancel

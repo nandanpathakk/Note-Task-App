@@ -8,12 +8,13 @@ import supabase from "@/lib/supabase";
 import { format, formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 import sanitizeHtml from 'sanitize-html';
+import { Note } from "@/types/database.types";
 
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [notesCount, setNotesCount] = useState(0);
-  const [recentNotes, setRecentNotes] = useState<any[]>([]);
+  const [recentNotes, setRecentNotes] = useState<Note[]>([]);
   const [summarizedCount, setSummarizedCount] = useState(0);
   const [lastActivity, setLastActivity] = useState<string | null>(null);
   const router = useRouter();

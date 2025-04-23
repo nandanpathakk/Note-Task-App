@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, Settings, Menu } from "lucide-react";
+import { User, LogOut, Menu } from "lucide-react";
 import supabase from "@/lib/supabase";
 
 // Add props interface
@@ -19,7 +18,7 @@ interface NavbarProps {
 
 export default function Navbar({ onMenuClick }: NavbarProps) {
   const router = useRouter();
-  const [userName, setUserName] = useState<any>(null);
+  const [userName, setUserName] = useState<string | null>(null);
 
   // Fetch user data
   useEffect(() => {

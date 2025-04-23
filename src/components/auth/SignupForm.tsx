@@ -63,6 +63,7 @@ export default function SignupForm() {
       router.push("/login");
     } catch (error) {
       toast.error("An unexpected error occurred")
+      console.error(error)
     } finally {
       setIsLoading(false);
     }
@@ -73,6 +74,7 @@ export default function SignupForm() {
     try {
       await signInWithGoogle();
     } catch (error) {
+      console.log(error)
       toast.error("Failed to sign in with Google")
     } finally {
       setIsLoading(false);

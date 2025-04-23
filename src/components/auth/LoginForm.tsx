@@ -49,6 +49,7 @@ export default function LoginForm() {
       }
       router.push("/dashboard");
     } catch (error) {
+      console.log(error)
       toast.error("An unexpected error occurred");
     } finally {
       setIsLoading(false);
@@ -61,6 +62,7 @@ export default function LoginForm() {
       await signInWithGoogle();
     } catch (error) {
       toast.error("Failed to sign in with Google");
+      console.log(error)
     } finally {
       setIsLoading(false);
     }
@@ -152,7 +154,7 @@ export default function LoginForm() {
       </Button>
       
       <div className="text-center text-sm">
-        Don't have an account?{" "}
+        Don&apos;t have an account?{" "}
         <Link 
           href="/signup" 
           className="font-medium text-blue-600 hover:text-blue-500"

@@ -1,7 +1,7 @@
 // app/dashboard/notes/[id]/view/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useNote, useDeleteNote } from '@/hooks/useNotes';
 import { Button } from '@/components/ui/button';
@@ -41,6 +41,7 @@ export default function NoteViewPage() {
       router.push("/dashboard/notes");
     } catch (error) {
       toast.error("Failed to delete note");
+      console.error(error)
       setIsDeleting(false);
       setIsDeleteDialogOpen(false);
     }
@@ -59,7 +60,7 @@ export default function NoteViewPage() {
       <div className="container py-6">
         <div className="flex flex-col items-center justify-center py-12">
           <h2 className="text-xl font-bold mb-2">Note not found</h2>
-          <p className="text-muted-foreground mb-4">The note you're looking for doesn't exist or you don't have access to it</p>
+          <p className="text-muted-foreground mb-4">The note you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it</p>
           <Link href="/dashboard/notes">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />

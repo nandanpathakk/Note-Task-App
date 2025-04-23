@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
 import Sidebar from "@/components/layout/Sidebar";
 import supabase from "@/lib/supabase";
-import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
   children,

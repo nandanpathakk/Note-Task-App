@@ -1,5 +1,4 @@
 // hooks/useNotes.ts
-import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import supabase from '@/lib/supabase';
 import { Note, CreateNoteInput, UpdateNoteInput } from '@/types/database.types';

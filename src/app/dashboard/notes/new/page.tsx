@@ -84,6 +84,7 @@ export default function NewNotePage() {
 
       router.push(`/dashboard/notes/${newNote.id}/view`);
     } catch (error) {
+      console.error(error)
       toast.error("Failed to create note");
       setIsSubmitting(false);
     }

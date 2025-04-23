@@ -41,6 +41,7 @@ export default function NoteCard({ note }: NoteCardProps) {
       await deleteNote.mutateAsync(note.id);
       toast.success("Your note has been deleted successfully");
     } catch (error) {
+      console.error(error)
       toast.error("Failed to delete note");
     }
   };
