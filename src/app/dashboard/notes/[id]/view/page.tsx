@@ -20,6 +20,7 @@ import {
   AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import sanitizeHtml from 'sanitize-html';
+import { SummarizeButton } from '@/components/notes/SummarizeButton';
 
 
 export default function NoteViewPage() {
@@ -32,6 +33,7 @@ export default function NoteViewPage() {
 
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [summary, setSummary] = useState<string | null>(null);
 
   const handleDelete = async () => {
     try {
@@ -46,6 +48,13 @@ export default function NoteViewPage() {
       setIsDeleteDialogOpen(false);
     }
   };
+
+  const handleSummarizeComplete = (newSummary: string) => {
+    setSummary(newSummary);
+  };
+
+  const displaySummary = summary || note?.summary;
+
 
   if (isLoading) {
     return (
@@ -85,6 +94,11 @@ export default function NoteViewPage() {
             <h1 className="text-2xl font-bold">{note.title}</h1>
           </div>
           <div className="flex gap-2">
+            <SummarizeButton
+              noteId={note?.id}
+              content={note.content}
+              onSummarizeComplete={handleSummarizeComplete}
+            />
             <Button
               variant="outline"
               size="sm"
@@ -128,10 +142,10 @@ export default function NoteViewPage() {
             <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(note.content || '') }} />
           </div>
 
-          {note.summary && (
+          {displaySummary && (
             <div className="p-4 bg-muted rounded-md mt-8">
               <h3 className="font-medium mb-2">AI Summary</h3>
-              <p className="text-muted-foreground">{note.summary}</p>
+              <p className="text-muted-foreground">{displaySummary}</p>
             </div>
           )}
 

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut, Menu } from "lucide-react";
 import supabase from "@/lib/supabase";
+import Link from "next/link";
 
 // Add props interface
 interface NavbarProps {
@@ -26,7 +27,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
       const { data } = await supabase.auth.getUser();
       setUserName(data.user?.user_metadata?.full_name);
     };
-    
+
     fetchUser();
   }, []);
 
@@ -42,18 +43,18 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
         <div className="flex items-center">
           {/* Mobile menu button */}
           {onMenuClick && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="md:hidden mr-2" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden mr-2"
               onClick={onMenuClick}
             >
               <Menu className="h-6 w-6" />
               <span className="sr-only">Open sidebar</span>
             </Button>
           )}
-          <h2 className="text-xl font-semibold text-gray-800">
-          👋 Hello, {userName} 
+          <h2 className="text-md md:text-xl font-semibold text-gray-800">
+            👋 Hello, {userName}
           </h2>
         </div>
         <div className="flex items-center">
@@ -64,10 +65,12 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
-              </DropdownMenuItem>
+              <Link href="/dashboard/profile" passHref>
+                <DropdownMenuItem className="cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuItem
                 className="cursor-pointer"
                 onClick={handleSignOut}

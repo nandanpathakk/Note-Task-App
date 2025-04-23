@@ -127,19 +127,36 @@ export function useSummarizeNote() {
 
     return useMutation({
         mutationFn: async ({ id, content }: { id: string, content: string }): Promise<Note> => {
-            // This will be replaced with the DeepSeek API call
-            // For now, we'll just simulate a summary
-            const summary = `Summary of: ${content.substring(0, 50)}...`;
+            try {
+                // Call our API endpoint that interfaces with ChatGPT
+                const response = await fetch('/api/summarize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content }),
+                });
 
-            const { data, error } = await supabase
-                .from('notes')
-                .update({ summary })
-                .eq('id', id)
-                .select()
-                .single();
+                if (!response.ok) {
+                    throw new Error('Failed to generate summary');
+                }
 
-            if (error) throw error;
-            return data;
+                const { summary } = await response.json();
+
+                // Update the note with the generated summary
+                const { data, error } = await supabase
+                    .from('notes')
+                    .update({ summary })
+                    .eq('id', id)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+                return data;
+            } catch (error) {
+                console.error('Error generating summary:', error);
+                throw error;
+            }
         },
         onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: ['notes'] });

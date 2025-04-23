@@ -26,7 +26,7 @@ export default function LoginPageClient() {
   // Show nothing while loading or redirecting
   if (loading || (isClient && user)) {
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="flex min-h-[100dvh] items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-black mx-auto"></div>
           <p className="mt-2 text-gray-600">Loading...</p>
@@ -36,7 +36,7 @@ export default function LoginPageClient() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-gray-50 px-10 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <LoginForm />
       </div>
