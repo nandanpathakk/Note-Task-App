@@ -2,66 +2,90 @@
 "use client";
 
 import { Note } from '@/types/database.types';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Edit, Trash } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { MoreHorizontal, Calendar } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
+import { useRouter } from 'next/navigation';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useDeleteNote } from '@/hooks/useNotes';
 import { toast } from 'sonner';
-import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
+import { Button } from '@/components/ui/button';
 
 interface NoteCardProps {
-    note: Note;
+  note: Note;
 }
 
 export default function NoteCard({ note }: NoteCardProps) {
-    const deleteNote = useDeleteNote();
+  const router = useRouter();
+  const deleteNote = useDeleteNote();
 
-    const handleDelete = async () => {
-        try {
-            await deleteNote.mutateAsync(note.id);
-            toast.success("Your note has been deleted successfully")
-        } catch (error) {
-            toast.error("Failed to delete note")
-        }
-    };
+  const handleCardClick = () => {
+    router.push(`/dashboard/notes/${note.id}/view`);
+  };
 
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="truncate">{note.title}</CardTitle>
-                <CardDescription>
-                    Updated {formatDistanceToNow(new Date(note.updated_at), { addSuffix: true })}
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <p className="line-clamp-3 text-sm text-muted-foreground">
-                    {note.content || "No content"}
-                </p>
-                {note.summary && (
-                    <div className="mt-2 p-2 bg-muted rounded-md">
-                        <p className="text-xs font-medium">Summary:</p>
-                        <p className="line-clamp-2 text-xs">{note.summary}</p>
-                    </div>
-                )}
-            </CardContent>
-            <CardFooter className="flex justify-between">
-                <Button variant="outline" size="sm" asChild>
-                    <Link href={`/app/notes/${note.id}`}>
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                    </Link>
-                </Button>
-                <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleDelete}
-                    disabled={deleteNote.isPending}
-                >
-                    <Trash className="h-4 w-4 mr-2" />
-                    Delete
-                </Button>
-            </CardFooter>
-        </Card>
-    );
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push(`/dashboard/notes/${note.id}/edit`);
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await deleteNote.mutateAsync(note.id);
+      toast.success("Your note has been deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete note");
+    }
+  };
+
+  return (
+    <Card 
+      className="cursor-pointer hover:shadow-md transition-shadow"
+      onClick={handleCardClick}
+    >
+      <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
+        <div>
+          <CardTitle className="truncate">{note.title}</CardTitle>
+          <CardDescription className="flex items-center text-xs mt-1">
+            <Calendar className="h-3 w-3 mr-1" />
+            {formatDistanceToNow(new Date(note.updated_at), { addSuffix: true })}
+          </CardDescription>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+            <DropdownMenuItem 
+              className="text-destructive focus:text-destructive" 
+              onClick={handleDelete}
+              disabled={deleteNote.isPending}
+            >
+              {deleteNote.isPending ? 'Deleting...' : 'Delete'}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </CardHeader>
+      <CardContent>
+        <p className="line-clamp-3 text-sm text-muted-foreground">
+          {note.content || "No content"}
+        </p>
+        {note.summary && (
+          <div className="mt-2 p-2 bg-muted/50 rounded-md">
+            <p className="text-xs font-medium text-muted-foreground">Summary:</p>
+            <p className="line-clamp-2 text-xs">{note.summary}</p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }

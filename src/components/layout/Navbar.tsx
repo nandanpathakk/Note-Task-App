@@ -19,13 +19,13 @@ interface NavbarProps {
 
 export default function Navbar({ onMenuClick }: NavbarProps) {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [userName, setUserName] = useState<any>(null);
 
   // Fetch user data
   useEffect(() => {
     const fetchUser = async () => {
       const { data } = await supabase.auth.getUser();
-      setUser(data.user);
+      setUserName(data.user?.user_metadata?.full_name);
     };
     
     fetchUser();
@@ -54,7 +54,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
             </Button>
           )}
           <h2 className="text-xl font-semibold text-gray-800">
-            Dashboard
+          👋 Hello, {userName} 
           </h2>
         </div>
         <div className="flex items-center">
@@ -68,10 +68,6 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
               <DropdownMenuItem className="cursor-pointer">
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"

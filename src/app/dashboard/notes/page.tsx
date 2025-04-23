@@ -28,13 +28,13 @@ export default function NotesPage() {
   }
 
   return (
-    <div className="container py-6">
+    <div className="container pb-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">My Notes</h1>
-        <Link href="/app/notes/new">
+        <Link href="notes/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            New Note
+            Create New Note
           </Button>
         </Link>
       </div>
@@ -43,7 +43,7 @@ export default function NotesPage() {
         <div className="flex flex-col items-center justify-center py-12">
           <h2 className="text-xl font-medium mb-2">No notes yet</h2>
           <p className="text-muted-foreground mb-4">Create your first note to get started</p>
-          <Link href="/app/notes/new">
+          <Link href="notes/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Create Note

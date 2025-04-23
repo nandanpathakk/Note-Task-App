@@ -32,7 +32,7 @@ export default function NewNotePage() {
       });
       toast.success("Your note has been created successfully")
       
-      router.push(`/app/notes/${newNote.id}`);
+      router.push(`/dashboard/notes/${newNote.id}`);
     } catch (error) {
       toast.error("Failed to create note")
     }

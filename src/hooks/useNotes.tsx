@@ -1,23 +1,32 @@
 // hooks/useNotes.ts
+import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import supabase from '@/lib/supabase';
 import { Note, CreateNoteInput, UpdateNoteInput } from '@/types/database.types';
-
+import { useAuth } from '@/context/AuthContext';
 
 export function useNotes() {
     return useQuery({
-        queryKey: ['notes'],
-        queryFn: async (): Promise<Note[]> => {
-            const { data, error } = await supabase
-                .from('notes')
-                .select('*')
-                .order('updated_at', { ascending: false });
-
-            if (error) throw error;
-            return data;
-        },
+      queryKey: ['notes'],
+      queryFn: async (): Promise<Note[]> => {
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
+  
+        if (userError) throw userError;
+  
+        const { data, error } = await supabase
+          .from('notes')
+          .select('*')
+          .eq('user_id', user?.id) // optional if RLS is setup
+          .order('updated_at', { ascending: false });
+  
+        if (error) throw error;
+        return data;
+      },
     });
-}
+  }
 
 // Fetch a single note by ID
 export function useNote(id: string | undefined) {
@@ -41,13 +50,24 @@ export function useNote(id: string | undefined) {
 
 // Create a new note
 export function useCreateNote() {
+
     const queryClient = useQueryClient();
+    const { user } = useAuth(); // Get the current user from your auth context
 
     return useMutation({
         mutationFn: async (note: CreateNoteInput): Promise<Note> => {
+            console.log("Current authenticated user:", user?.id);
+
+            if (!user) {
+                throw new Error('You must be logged in to create a note');
+            }
+
             const { data, error } = await supabase
                 .from('notes')
-                .insert([note])
+                .insert([{
+                    ...note,
+                    user_id: user.id,
+                }])
                 .select()
                 .single();
 

@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import { useAuth } from "@/context/AuthContext";
 
 const formSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()
@@ -38,6 +39,7 @@ export default function SignupForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -48,7 +50,7 @@ export default function SignupForm() {
     setIsLoading(true);
     
     try {
-      const { error } = await signUp(values.email, values.password);
+      const { error } = await signUp(values.email, values.password, values.name);
       
       if (error) {
         toast.error(error.message || "Failed to sign up")
@@ -86,6 +88,24 @@ export default function SignupForm() {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Your name" 
+                    {...field} 
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          
           <FormField
             control={form.control}
             name="email"

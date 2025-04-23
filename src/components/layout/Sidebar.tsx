@@ -14,7 +14,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   const pathname = usePathname();
   
   const navigation = [
-    { name: "Dashboard", href: "/dashboard", icon: Home },
+    { name: "Home", href: "/dashboard", icon: Home },
     { name: "Notes", href: "/dashboard/notes", icon: FileText },
   ];
 
