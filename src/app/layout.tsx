@@ -8,7 +8,7 @@ import { QueryClientProvider } from "@/components/providers/QueryClientProvider"
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "AI Notes App",
+  title: "Notes App",
   description: "A smart notes app with AI summarization",
 };
 

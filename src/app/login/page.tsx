@@ -3,8 +3,8 @@ import { Metadata } from "next";
 import LoginPageClient from "./client";
 
 export const metadata: Metadata = {
-  title: "Login - AI Notes",
-  description: "Login to your AI Notes account",
+  title: "Login - Notes",
+  description: "Login to your Notes account",
 };
 
 export default function LoginPage() {

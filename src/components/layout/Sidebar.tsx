@@ -21,7 +21,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center justify-center h-16 flex-shrink-0 px-4 border-b border-gray-200">
-        <h1 className="text-xl font-bold">AI Notes</h1>
+        <h1 className="text-xl font-bold">Notes</h1>
       </div>
       <nav className="mt-5 flex-1 px-2 space-y-1 overflow-y-auto">
         {navigation.map((item) => {

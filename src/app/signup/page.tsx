@@ -3,8 +3,8 @@ import { Metadata } from "next";
 import SignupPageClient from "./client";
 
 export const metadata: Metadata = {
-  title: "Sign Up - AI Notes",
-  description: "Create your AI Notes account",
+  title: "Sign Up - Notes",
+  description: "Create your Notes account",
 };
 
 export default function SignupPage() {

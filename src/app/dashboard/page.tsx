@@ -7,6 +7,8 @@ import Link from "next/link";
 import supabase from "@/lib/supabase";
 import { format, formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
+import sanitizeHtml from 'sanitize-html';
+
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
@@ -22,14 +24,14 @@ export default function Dashboard() {
       try {
         // Get user
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (user) {
           // Count notes
           const { count } = await supabase
             .from('notes')
             .select('*', { count: 'exact', head: true })
             .eq('user_id', user.id);
-            
+
           // Get recent notes
           const { data: recent } = await supabase
             .from('notes')
@@ -37,14 +39,14 @@ export default function Dashboard() {
             .eq('user_id', user.id)
             .order('updated_at', { ascending: false })
             .limit(2);
-          
+
           // Count notes with summaries
           const { count: summarizedNotesCount } = await supabase
             .from('notes')
             .select('*', { count: 'exact', head: true })
             .eq('user_id', user.id)
             .not('summary', 'is', null);
-          
+
           // Get last activity date
           const { data: latestNote } = await supabase
             .from('notes')
@@ -53,7 +55,7 @@ export default function Dashboard() {
             .order('updated_at', { ascending: false })
             .limit(1)
             .single();
-            
+
           setNotesCount(count || 0);
           setRecentNotes(recent || []);
           setSummarizedCount(summarizedNotesCount || 0);
@@ -65,7 +67,7 @@ export default function Dashboard() {
         setIsLoading(false);
       }
     };
-    
+
     fetchDashboardData();
   }, []);
 
@@ -159,7 +161,7 @@ export default function Dashboard() {
           </Card>
         </div>
       )}
-      
+
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold">Recent Notes</h2>
@@ -192,8 +194,8 @@ export default function Dashboard() {
         ) : recentNotes.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {recentNotes.map((note) => (
-              <Card 
-                key={note.id} 
+              <Card
+                key={note.id}
                 className="cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => handleNoteClick(note.id)}
               >
@@ -201,7 +203,7 @@ export default function Dashboard() {
                   <CardTitle className="truncate">{note.title}</CardTitle>
                   <CardDescription className="flex items-center text-xs">
                     <Calendar className="mr-1 h-3 w-3" />
-                    {format(new Date(note.updated_at), "MMM d, yyyy")} · 
+                    {format(new Date(note.updated_at), "MMM d, yyyy")} ·
                     {note.summary ? (
                       <span className="flex items-center ml-2">
                         <Sparkles className="h-3 w-3 text-primary mr-1" />
@@ -216,9 +218,9 @@ export default function Dashboard() {
                       <p className="line-clamp-3 text-sm">{note.summary}</p>
                     </div>
                   ) : (
-                    <p className="line-clamp-3 text-sm text-muted-foreground">
-                      {note.content || "No content"}
-                    </p>
+                    <div className="line-clamp-3 text-sm text-muted-foreground">
+                      <p dangerouslySetInnerHTML={{ __html: sanitizeHtml(note.content || 'No content') }} />
+                    </div>
                   )}
                 </CardContent>
               </Card>

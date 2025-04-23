@@ -6,10 +6,18 @@ import { useParams, useRouter } from 'next/navigation';
 import { useNote, useUpdateNote, useSummarizeNote } from '@/hooks/useNotes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { Loader2, ArrowLeft, Sparkles, Save } from 'lucide-react';
 import Link from 'next/link';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Placeholder from '@tiptap/extension-placeholder';
+import Underline from '@tiptap/extension-underline';
+import TiptapLink from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
+import Image from '@tiptap/extension-image';
+import { EditorMenuBar } from '@/components/notes/EditorMenuBar';
+import sanitizeHtml from 'sanitize-html';
 
 export default function NoteEditPage() {
   const params = useParams();
@@ -21,28 +29,74 @@ export default function NoteEditPage() {
   const summarizeNote = useSummarizeNote();
   
   const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  
 
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      TiptapLink.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-primary underline',
+        },
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      Image,
+      Placeholder.configure({
+        placeholder: 'Edit your note here...',
+      }),
+    ],
+    content: '',
+    editorProps: {
+      attributes: {
+        class: 'min-h-[400px] p-4 focus:outline-none prose prose-sm dark:prose-invert max-w-none',
+      },
+    },
+  });
+
+  // Set initial content when note data is loaded
   useEffect(() => {
     if (note) {
       setTitle(note.title);
-      setContent(note.content || '');
+      if (editor && !editor.isDestroyed) {
+        editor.commands.setContent(note.content || '');
+      }
     }
-  }, [note]);
+  }, [note, editor]);
 
-  const handleSave = async () => {
+  const handleSave = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    
     if (!title.trim()) {
       toast.warning("Please enter a title for your note");
       return;
     }
+
+    if (!editor || editor.isEmpty) {
+      toast.warning("Please add some content to your note");
+      return;
+    }
+
+    const cleanContent = sanitizeHtml(editor.getHTML(), {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+      allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        img: ['src', 'alt', 'width', 'height'],
+        a: ['href', 'target', 'rel']
+      },
+      allowedSchemes: ['http', 'https', 'data'],
+    });
 
     try {
       setIsSaving(true);
       await updateNote.mutateAsync({
         id: noteId,
         title,
-        content,
+        content: cleanContent,
       });
 
       toast.success("Your note has been saved successfully");
@@ -55,13 +109,26 @@ export default function NoteEditPage() {
   };
 
   const handleSummarize = async () => {
-    if (!content.trim()) {
+    if (!editor || editor.isEmpty) {
       toast.warning("Please add some content to summarize");
       return;
     }
 
+    const cleanContent = sanitizeHtml(editor.getHTML(), {
+      allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+      allowedAttributes: {
+        ...sanitizeHtml.defaults.allowedAttributes,
+        img: ['src', 'alt', 'width', 'height'],
+        a: ['href', 'target', 'rel']
+      },
+      allowedSchemes: ['http', 'https', 'data'],
+    });
+
     try {
-      await summarizeNote.mutateAsync({ id: noteId, content });
+      await summarizeNote.mutateAsync({ 
+        id: noteId, 
+        content: cleanContent
+      });
       toast.success("Your note has been summarized successfully");
     } catch (error) {
       toast.error("Failed to generate summary");
@@ -106,7 +173,7 @@ export default function NoteEditPage() {
         </div>
         <Button 
           onClick={handleSave}
-          disabled={isSaving}
+          disabled={isSaving || !title.trim() || (editor ? editor.isEmpty : true)}
         >
           {isSaving ? (
             <>
@@ -122,23 +189,19 @@ export default function NoteEditPage() {
         </Button>
       </div>
       
-      <div className="space-y-4">
+      <form onSubmit={handleSave} className="space-y-6">
         <div>
           <Input
             placeholder="Note Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="text-lg font-medium"
+            className="text-xl font-medium"
           />
         </div>
         
-        <div>
-          <Textarea
-            placeholder="Write your note here..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="min-h-[300px]"
-          />
+        <div className="border rounded-md">
+          {editor && <EditorMenuBar editor={editor} />}
+          <EditorContent editor={editor} className="min-h-[400px]" />
         </div>
         
         {note.summary && (
@@ -148,11 +211,12 @@ export default function NoteEditPage() {
           </div>
         )}
         
-        <div className="flex justify-start">
+        <div className="flex justify-start gap-2">
           <Button
+            type="button"
             variant="outline"
             onClick={handleSummarize}
-            disabled={summarizeNote.isPending || !content.trim()}
+            disabled={summarizeNote.isPending || (editor ? editor.isEmpty : true)}
           >
             {summarizeNote.isPending ? (
               <>
@@ -166,8 +230,16 @@ export default function NoteEditPage() {
               </>
             )}
           </Button>
+          
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => router.push(`/dashboard/notes/${noteId}/view`)}
+          >
+            Cancel
+          </Button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

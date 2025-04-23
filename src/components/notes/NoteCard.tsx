@@ -15,6 +15,8 @@ import {
 import { useDeleteNote } from '@/hooks/useNotes';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
+import sanitizeHtml from 'sanitize-html';
+
 
 interface NoteCardProps {
   note: Note;
@@ -76,9 +78,10 @@ export default function NoteCard({ note }: NoteCardProps) {
         </DropdownMenu>
       </CardHeader>
       <CardContent>
-        <p className="line-clamp-3 text-sm text-muted-foreground">
-          {note.content || "No content"}
-        </p>
+        <div className="line-clamp-3 text-sm text-muted-foreground">
+          {/* {note.content || "No content"} */}
+          <p dangerouslySetInnerHTML={{ __html: sanitizeHtml(note.content || 'No content') }} />
+        </div>
         {note.summary && (
           <div className="mt-2 p-2 bg-muted/50 rounded-md">
             <p className="text-xs font-medium text-muted-foreground">Summary:</p>
