@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCreateNote } from '@/hooks/useNotes';
+import { useCreateNote, useGenerateTitle } from '@/hooks/useNotes';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -21,9 +21,11 @@ import sanitizeHtml from 'sanitize-html';
 export default function NewNotePage() {
   const router = useRouter();
   const createNote = useCreateNote();
+  const generateTitle = useGenerateTitle();
 
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGeneratingTitle, setIsGeneratingTitle] = useState<boolean>(false);
 
   const editor = useEditor({
     extensions: [
@@ -54,11 +56,6 @@ export default function NewNotePage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim()) {
-      toast.warning("Please enter a title for your note");
-      return;
-    }
-
     if (!editor?.getHTML() || editor?.isEmpty) {
       toast.warning("Please add some content to your note");
       return;
@@ -76,12 +73,27 @@ export default function NewNotePage() {
 
     try {
       setIsSubmitting(true);
+
+      let finalTitle = title.trim();
+      if (!finalTitle) {
+        setIsGeneratingTitle(true);
+        try {
+          finalTitle = await generateTitle.mutateAsync(cleanContent);
+          toast.success("Title generated automatically");
+        } catch (error) {
+          console.error("Failed to generate title:", error);
+          finalTitle = "Untitled Note"; // Fallback title
+          toast.error("Failed to generate title, using default");
+        } finally {
+          setIsGeneratingTitle(false);
+        }
+      }
+
       const newNote = await createNote.mutateAsync({
-        title,
+        title: finalTitle,
         content: cleanContent,
       });
       toast.success("Your note has been created successfully");
-
       router.push(`/dashboard/notes/${newNote.id}/view`);
     } catch (error) {
       console.error(error)
@@ -99,16 +111,16 @@ export default function NewNotePage() {
               <ArrowLeft className="h-5 w-5" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold">Create New Note</h1>
+          <h1 className="md:text-2xl text-xl font-bold">Create New Note</h1>
         </div>
         <Button
           onClick={handleSubmit}
-          disabled={isSubmitting || !title.trim() || !editor?.getHTML() || editor?.isEmpty}
+          disabled={isSubmitting || isGeneratingTitle || !editor?.getHTML() || editor?.isEmpty}
         >
-          {isSubmitting ? (
+          {isSubmitting || isGeneratingTitle ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating...
+              {isGeneratingTitle ? 'Generating title...' : 'Creating...'}
             </>
           ) : (
             <>
@@ -122,10 +134,10 @@ export default function NewNotePage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <Input
-            placeholder="Note Title"
+            placeholder="Note Title (Leave empty for auto-generation)"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="text-xl font-medium"
+            className="md:text-sm text-sm font-medium"
           />
         </div>
 

@@ -3,7 +3,7 @@
 
 import { Note } from '@/types/database.types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MoreHorizontal, Calendar } from 'lucide-react';
+import { MoreHorizontal,MoreVertical, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import {
@@ -47,13 +47,13 @@ export default function NoteCard({ note }: NoteCardProps) {
   };
 
   return (
-    <Card 
+    <Card
       className="cursor-pointer hover:shadow-md transition-shadow"
       onClick={handleCardClick}
     >
       <CardHeader className="pb-2 flex flex-row items-start justify-between space-y-0">
-        <div>
-          <CardTitle className="truncate">{note.title}</CardTitle>
+        <div className="flex-1 min-w-0">
+          <CardTitle className="truncate text-base">{note.title}</CardTitle>
           <CardDescription className="flex items-center text-xs mt-1">
             <Calendar className="h-3 w-3 mr-1" />
             {formatDistanceToNow(new Date(note.updated_at), { addSuffix: true })}
@@ -62,14 +62,14 @@ export default function NoteCard({ note }: NoteCardProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
             <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
+              <MoreVertical className="h-4 w-4" />
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
-            <DropdownMenuItem 
-              className="text-destructive focus:text-destructive" 
+            <DropdownMenuItem
+              className="text-destructive focus:text-destructive"
               onClick={handleDelete}
               disabled={deleteNote.isPending}
             >

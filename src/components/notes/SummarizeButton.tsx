@@ -16,7 +16,7 @@ interface SummarizeButtonProps {
 export function SummarizeButton({
     noteId,
     content,
-    variant = 'secondary',
+    variant = 'outline',
     size = 'default',
     className = '',
     onSummarizeComplete,

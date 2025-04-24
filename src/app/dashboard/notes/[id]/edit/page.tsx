@@ -31,7 +31,6 @@ export default function NoteEditPage() {
   const [title, setTitle] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -53,7 +52,7 @@ export default function NoteEditPage() {
     content: '',
     editorProps: {
       attributes: {
-        class: 'min-h-[400px] p-4 focus:outline-none prose prose-sm dark:prose-invert max-w-none',
+        class: 'min-h-[300px] sm:min-h-[400px] p-2 sm:p-4 focus:outline-none prose prose-sm dark:prose-invert max-w-none',
       },
     },
   });
@@ -147,10 +146,10 @@ export default function NoteEditPage() {
 
   if (error || !note) {
     return (
-      <div className="container py-6">
+      <div className="container px-4 py-6">
         <div className="flex flex-col items-center justify-center py-12">
           <h2 className="text-xl font-bold mb-2">Note not found</h2>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-4 text-center">
             The note you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it
           </p>
           <Link href="/dashboard/notes">
@@ -165,19 +164,20 @@ export default function NoteEditPage() {
   }
 
   return (
-    <div className="container py-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+    <div className="container px-4 sm:px-6 py-4 sm:py-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 mb-4 sm:mb-6">
+        <div className="flex items-center gap-2 sm:gap-4">
           <Link href={`/dashboard/notes/${noteId}/view`}>
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold">Edit Note</h1>
+          <h1 className="text-xl sm:text-2xl font-bold">Edit Note</h1>
         </div>
         <Button
           onClick={handleSave}
           disabled={isSaving || !title.trim() || (editor ? editor.isEmpty : true)}
+          className="w-full sm:w-auto"
         >
           {isSaving ? (
             <>
@@ -193,34 +193,35 @@ export default function NoteEditPage() {
         </Button>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-6">
+      <form onSubmit={handleSave} className="space-y-4 sm:space-y-6">
         <div>
           <Input
             placeholder="Note Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="text-xl font-medium"
+            className="text-lg sm:text-xl font-medium"
           />
         </div>
 
         <div className="border rounded-md">
           {editor && <EditorMenuBar editor={editor} />}
-          <EditorContent editor={editor} className="min-h-[400px]" />
+          <EditorContent editor={editor} className="min-h-[300px] sm:min-h-[400px]" />
         </div>
 
         {note.summary && (
-          <div className="p-4 bg-muted rounded-md">
-            <h3 className="font-medium mb-2">AI Summary</h3>
-            <p className="text-sm text-muted-foreground">{note.summary}</p>
+          <div className="p-3 sm:p-4 bg-muted rounded-md">
+            <h3 className="font-medium mb-1 sm:mb-2">AI Summary</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">{note.summary}</p>
           </div>
         )}
 
-        <div className="flex justify-start gap-2">
+        <div className="flex flex-col sm:flex-row justify-start gap-2">
           <Button
             type="button"
             variant="outline"
             onClick={handleSummarize}
             disabled={summarizeNote.isPending || (editor ? editor.isEmpty : true)}
+            className="w-full sm:w-auto order-1 sm:order-none"
           >
             {summarizeNote.isPending ? (
               <>
@@ -239,6 +240,7 @@ export default function NoteEditPage() {
             type="button"
             variant="outline"
             onClick={() => router.push(`/dashboard/notes/${noteId}/view`)}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>

@@ -272,7 +272,7 @@ export default function ProfilePage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your account and remove your data from our servers.
+              This is a dummy button and currently not functional
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

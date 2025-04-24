@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useNote, useDeleteNote } from '@/hooks/useNotes';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, ArrowLeft, Edit, Trash } from 'lucide-react';
+import { Loader2, ArrowLeft, Edit, Trash, Menu } from 'lucide-react';
 import Link from 'next/link';
 import {
   AlertDialog,
@@ -55,7 +55,6 @@ export default function NoteViewPage() {
 
   const displaySummary = summary || note?.summary;
 
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-[calc(100vh-64px)]">
@@ -83,17 +82,21 @@ export default function NoteViewPage() {
 
   return (
     <>
-      <div className="container py-6">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+      <div className="container py-4 px-4 md:py-6 md:px-6">
+        {/* Header section */}
+        <div className="flex flex-col space-y-4 md:space-y-0 md:flex-row md:items-center md:justify-between mb-6">
+          {/* Back button and title */}
+          <div className="flex items-start gap-2 md:gap-4 w-full md:w-auto">
             <Link href="/dashboard/notes">
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="mt-1 md:mt-0">
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
-            <h1 className="text-2xl font-bold">{note.title}</h1>
+            <h1 className="text-xl md:text-2xl font-bold line-clamp-2 md:line-clamp-1 flex-1 pr-2">{note.title}</h1>
           </div>
-          <div className="flex gap-2">
+          
+          {/* Action buttons - desktop */}
+          <div className="hidden md:flex items-center gap-2 flex-shrink-0">
             <SummarizeButton
               noteId={note?.id}
               content={note.content}
@@ -134,6 +137,53 @@ export default function NoteViewPage() {
               </AlertDialogContent>
             </AlertDialog>
           </div>
+
+          {/* Action buttons - mobile */}
+          <div className="flex md:hidden items-center gap-2 justify-between w-full">
+            <SummarizeButton
+              noteId={note?.id}
+              content={note.content}
+              onSummarizeComplete={handleSummarizeComplete}
+              variant="outline"
+              size="sm"
+              className="flex-1"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push(`/dashboard/notes/${noteId}/edit`)}
+              className="flex-1"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" size="sm" className="flex-1">
+                  <Trash className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your note.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {isDeleting ? 'Deleting...' : 'Delete'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         </div>
 
         <div className="space-y-6">
@@ -149,7 +199,7 @@ export default function NoteViewPage() {
             </div>
           )}
 
-          <div className="text-sm text-muted-foreground pt-4">
+          <div className="text-xs md:text-sm text-muted-foreground pt-4">
             <p>Created: {new Date(note.created_at).toLocaleString()}</p>
             {note.updated_at && note.updated_at !== note.created_at && (
               <p>Last updated: {new Date(note.updated_at).toLocaleString()}</p>
@@ -158,33 +208,10 @@ export default function NoteViewPage() {
         </div>
       </div>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure you want to delete this note?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this note.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="bg-red-500 hover:bg-red-600"
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete"
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* This duplicate AlertDialog isn't needed anymore since we're handling it inline */}
+      {/* <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        ...
+      </AlertDialog> */}
     </>
   );
 }

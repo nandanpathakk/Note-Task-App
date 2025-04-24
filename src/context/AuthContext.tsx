@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { useRouter } from "next/navigation";
 import supabase from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
+import { usePathname } from "next/navigation";
 
 
 interface AuthError {
@@ -24,9 +25,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const pathname = usePathname();
+
 
   useEffect(() => {
     const getUser = async () => {
@@ -43,7 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
 
         if (event === "SIGNED_IN" && session) {
-          router.push("/dashboard");
+          // router.push("/dashboard");
+          if (pathname !== "/dashboard") {
+            router.push("/dashboard");
+            console.log("Redirectin to dashboard")
+          }
         }
         if (event === "SIGNED_OUT") {
           router.push("/login");
@@ -63,8 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, name: string) => {
     // First sign up the user
-    const { error } = await supabase.auth.signUp({ 
-      email, 
+    const { error } = await supabase.auth.signUp({
+      email,
       password,
       options: {
         data: {
@@ -81,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.updateUser({
       data: { full_name: name }
     });
-    
+
     return { error };
   };
 

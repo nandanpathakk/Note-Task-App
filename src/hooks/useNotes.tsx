@@ -6,26 +6,26 @@ import { useAuth } from '@/context/AuthContext';
 
 export function useNotes() {
     return useQuery({
-      queryKey: ['notes'],
-      queryFn: async (): Promise<Note[]> => {
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-  
-        if (userError) throw userError;
-  
-        const { data, error } = await supabase
-          .from('notes')
-          .select('*')
-          .eq('user_id', user?.id) // optional if RLS is setup
-          .order('updated_at', { ascending: false });
-  
-        if (error) throw error;
-        return data;
-      },
+        queryKey: ['notes'],
+        queryFn: async (): Promise<Note[]> => {
+            const {
+                data: { user },
+                error: userError,
+            } = await supabase.auth.getUser();
+
+            if (userError) throw userError;
+
+            const { data, error } = await supabase
+                .from('notes')
+                .select('*')
+                .eq('user_id', user?.id) // optional if RLS is setup
+                .order('updated_at', { ascending: false });
+
+            if (error) throw error;
+            return data;
+        },
     });
-  }
+}
 
 // Fetch a single note by ID
 export function useNote(id: string | undefined) {
@@ -164,3 +164,32 @@ export function useSummarizeNote() {
         },
     });
 }
+
+// Generate title for a note
+export function useGenerateTitle() {
+    return useMutation({
+        mutationFn: async (content: string): Promise<string> => {
+            try {
+                const response = await fetch('/api/generateTitle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content }),
+                })
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate title');
+                }
+
+                const { title } = await response.json();
+                return title;
+            } catch (error) {
+                console.error('Error generating title:', error);
+                throw error;
+            }
+        }
+    })
+}
+
+
