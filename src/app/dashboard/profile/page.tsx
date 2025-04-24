@@ -9,10 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { toast } from 'sonner';
 import { 
   Loader2, 
-  User, 
-  Mail, 
   Save, 
-  Calendar, 
   LogOut, 
   Trash2, 
   Edit, 
@@ -28,7 +25,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Separator } from '@/components/ui/separator';
 
 export default function ProfilePage() {
   const { user, updateUserName, signOut } = useAuth();
@@ -64,6 +60,7 @@ export default function ProfilePage() {
       toast.success("You have been logged out");
     } catch (error) {
       toast.error("Failed to log out");
+      console.error(error)
       setIsLoggingOut(false);
     }
   };

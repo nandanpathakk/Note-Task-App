@@ -6,7 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useNote, useDeleteNote } from '@/hooks/useNotes';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { Loader2, ArrowLeft, Edit, Trash, Menu } from 'lucide-react';
+import { Loader2, ArrowLeft, Edit, Trash } from 'lucide-react';
 import Link from 'next/link';
 import {
   AlertDialog,
@@ -31,7 +31,6 @@ export default function NoteViewPage() {
   const { data: note, isLoading, error } = useNote(noteId);
   const deleteNote = useDeleteNote();
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [summary, setSummary] = useState<string | null>(null);
 
@@ -45,7 +44,6 @@ export default function NoteViewPage() {
       toast.error("Failed to delete note");
       console.error(error)
       setIsDeleting(false);
-      setIsDeleteDialogOpen(false);
     }
   };
 
@@ -208,10 +206,6 @@ export default function NoteViewPage() {
         </div>
       </div>
 
-      {/* This duplicate AlertDialog isn't needed anymore since we're handling it inline */}
-      {/* <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        ...
-      </AlertDialog> */}
     </>
   );
 }

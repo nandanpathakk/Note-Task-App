@@ -4,7 +4,7 @@
 import { useNotes } from '@/hooks/useNotes';
 import NoteCard from '@/components/notes/NoteCard';
 import { Button } from '@/components/ui/button';
-import { Loader2, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function NotesPage() {

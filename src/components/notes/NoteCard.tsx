@@ -3,7 +3,7 @@
 
 import { Note } from '@/types/database.types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { MoreHorizontal,MoreVertical, Calendar } from 'lucide-react';
+import { MoreVertical, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import {
